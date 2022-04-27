@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="yahtzee.css">
+        <title>Yahtzee | HW2</title>
+        <!--	Name:	
+    Course:	235.01
+    HomeWork:	#2
+    Git-Hub:	https://github.com/Kevin-Lucey/CSC235-HW2
+    -->	
+    </head>
+    <body>
+        <script lang="JavaScript">
+            //global variables to keep track of game states
+        var val   = Array(0,0,0,0,0);                     //dice values
+        var held   = Array(false,false,false,false,false); //if a die is held or not. false = not held
+        var rolnum = 0;                                    //number of rolls
+        var rounds = 0;                                    //number of rounds
+        var total  = 0;                                    //total score
+        var scoreVals = Array();
+        var scoreBoard = Array(0,0,0,0,0,0,0,0,0);
+
+        function roll()
+        {   
+            if(rounds==14)
+            {
+                alert("Your final score is: "+total);
+                newGame();
+            }
+            //roll the die
+            if(rolnum<3)
+            {    
+                rolnum++;
+                for(i=0;i<5;i++)
+                    {
+                        if(!held[i]){
+                            val[i] = Math.floor((6*Math.random())+1); //now the die has a value
+                            updateDie(i,val[i])
+                        }
+                    }
+            }
+            if(rolnum ==3)
+            {
+                //round is over
+                rounds++;
+                rolnum=0;
+                //tally the score
+                scoreVals = checkVals(val);
+                //unhold the die
+                held = Array(false,false,false,false,false)
+                for(j=0;j<5;j++)
+                {
+                    hold(j); //hold all of the dice to indicate the end of a round
+                }
+            }
+        }
+        function hold(h)
+        {   
+            if(!held[h]){
+                held[h] = !held[h];
+                var heldStr = "X"+val[h];
+                updateDie(h,heldStr);
+            }
+        }
+        function checkVals() //returns an array 
+        {
+            var scoreValtemp = [0,0,0,0,0,0,0,0,0];
+            var numSeen   = [0,0,0,0,0,0];
+            for(i=0;i<6;i++)
+            {
+                numSeen[val[i]-1]++; //finds how many times each number is in the array of dice
+            }
+            k=1;
+            for(j=0;j<6;j++)   //adds to score vals the die value times the frequency
+            {
+                scoreValtemp[j] = numSeen[j]*k;
+                k++;
+            }
+            if(Math.max(...numSeen)==3)
+            {
+                sum = val.reduce((x, y) => {
+                  return x + y;
+                });
+                scoreValtemp[6] = sum;
+            } 
+            if(Math.max(...numSeen)==4)
+            {
+                sum = val.reduce((x, y) => {
+                  return x + y;
+                });
+                scoreValtemp[7] = sum;
+            } 
+            if(Math.max(...numSeen)==5)
+            {
+                sum = val.reduce((x, y) => {
+                  return x + y;
+                });
+                scoreValtemp[8] = sum;
+            } 
+
+            return scoreValtemp;
+        }
+        function updateDie(ind, valInd)
+        {
+            document.getElementById('d'+ind).src = "pix/dice"+valInd+".gif"; //finds element, assigns a new src
+        }
+        function tally(ind, id)
+        {
+            document.getElementById(id).textContent = scoreVals[ind];
+        }
+        function cleartile(id)
+        {
+            document.getElementById(id).textContent = " "
+        }
+        function score(ind, id)
+        {
+            total += scoreVals[ind];
+            scoreBoard[id] = scoreVals[ind];
+
+            updateTotal();
+            newRound();
+        }
+        function updateTotal()
+        {
+            document.getElementById("k").textContent = total;            
+        }
+        function newRound()
+        {
+            scoreVals=Array();
+            for(j=0;j<5;j++)
+                {
+                    held[j] = false;
+                    document.getElementById("d"+j).src = "pix/dice0.gif"; //unhold all of the dice to indicate the end of a round
+                }
+        }
+        function newGame(){
+            var val   = Array(0,0,0,0,0);                     //dice values
+            var held   = Array(false,false,false,false,false); //if a die is held or not. false = not held
+            var rolnum = 0;                                    //number of rolls
+            var rounds = 0;                                    //number of rounds
+            var total  = 0;                                    //total score
+            document.getElementById("k").textContent = ""; 
+            var scoreBoard = Array(0,0,0,0,0,0,0,0,0);
+            newRound(); //resets die to blank tiles and sets score vals to an empty array
+        }
+        </script>
+        <!-- newGame() will reset the variables.-->
+
+        <div class="title">
+            <h1><b>Yahtzee</b></h1>
+        </div>
+        <div class="gameBoard">
+            <div class="dice">
+                <table class="diceTable">
+                    <tr>
+                        <td><a onclick="hold('0')"><img id="d0" src="pix/dice0.gif"></a><td>
+                        <td><a onclick="hold('1')"><img id="d1" src="pix/dice0.gif"></a><td>
+                        <td><a onclick="hold('2')"><img id="d2" src="pix/dice0.gif"></a><td>
+                        <td><a onclick="hold('3')"><img id="d3" src="pix/dice0.gif"></a><td>
+                        <td><a onclick="hold('4')"><img id="d4" src="pix/dice0.gif"></a><td>
+                    </tr>
+                </table>
+            </div>
+            <div class="scr">
+                <table class="scrs">
+                    <tr><td id="label">1's</td>            <td onmouseover='tally(0,"b")' onmouseout='cleartile("b")'  onmousedown="score(0,'b')" class='scoretile' id ='b'> </td></tr>
+                    <tr><td id="label">2's</td>            <td onmouseover='tally(1,"c")' onmouseout= 'cleartile("c")' onmousedown="score(1,'c')" class='scoretile' id="c"> </td></tr>
+                    <tr><td id="label">3's</td>            <td onmouseover='tally(2,"d")' onmouseout= 'cleartile("d")' onmousedown="score(2,'d')" class='scoretile' id="d"> </td></tr>
+                    <tr><td id="label">4's</td>            <td onmouseover='tally(3,"e")' onmouseout= 'cleartile("e")' onmousedown="score(3,'e')" class='scoretile' id="e"> </td></tr>
+                    <tr><td id="label">5's</td>            <td onmouseover='tally(4,"f")' onmouseout= 'cleartile("f")' onmousedown="score(4,'f')" class='scoretile' id="f"> </td></tr>
+                    <tr><td id="label">6's</td>            <td onmouseover='tally(5,"g")' onmouseout= 'cleartile("g")' onmousedown="score(5,'g')" class='scoretile' id="g"> </td></tr>
+                    <tr><td id="label">3 of a kind</td>    <td onmouseover='tally(6,"h")' onmouseout= 'cleartile("h")' onmousedown="score(6,'h')" class='scoretile' id="h"> </td></tr>
+                    <tr><td id="label">4 of a kind</td>    <td onmouseover='tally(7,"i")' onmouseout= 'cleartile("i")' onmousedown="score(7,'i')" class='scoretile' id="i"> </td></tr>
+                    <tr><td id="label">Yahtzee</td>        <td onmouseover='tally(8,"j")' onmouseout= 'cleartile("j")' onmousedown="score(8,'j')" class='scoretile' id="j"> </td></tr>
+                    <tr><td id="label">Total</td>                     <td class='scoretile' id="k"></td></tr>
+                </table>
+            </div>
+            <div  class="inputs">
+                <table class = "btn">
+                    <tr><td><button class='rollbtn' onClick="roll()">Roll</button></td></tr>
+                    <tr><td><button class='newgamebtn' onClick="newGame()">New Game</button></td></tr>
+                </table>
+            </div>
+        </div>
+    </body>
+</html>
